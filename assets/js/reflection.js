@@ -1,7 +1,7 @@
 let selectedRating = 0;
 
 const stars = document.querySelectorAll("#stars span");
-const note = document.getElementById("note");
+const reflectionText = document.getElementById("reflectionText");
 const msg = document.getElementById("msg");
 
 function activeMemberId() {
@@ -15,13 +15,13 @@ function todayKey() {
 }
 
 function setDayLabel() {
-  document.getElementById("dayLabel").innerText =
-    "Reflection for " + new Date().toDateString();
+  var dayLabel = document.getElementById("dayLabel");
+  if (dayLabel) dayLabel.innerText = "Reflection for " + new Date().toDateString();
 }
 
 stars.forEach(star => {
   star.addEventListener("click", () => {
-    selectedRating = parseInt(star.dataset.val);
+    selectedRating = parseInt(star.dataset.star, 10);
     updateStars();
   });
 });
@@ -33,22 +33,25 @@ function updateStars() {
 }
 
 function saveReflection() {
+  const textEl = document.getElementById("reflectionText");
   const data = {
     rating: selectedRating,
-    note: note.value
+    note: textEl ? textEl.value : "",
+    text: textEl ? textEl.value : ""
   };
   localStorage.setItem(todayKey(), JSON.stringify(data));
-  msg.innerText = "✅ Reflection saved";
-  setTimeout(() => msg.innerText = "", 2000);
+  if (msg) msg.innerText = "✅ Reflection saved";
+  setTimeout(() => { if (msg) msg.innerText = ""; }, 2000);
 }
 
 function loadReflection() {
+  const textEl = document.getElementById("reflectionText");
   const raw = localStorage.getItem(todayKey());
   if (!raw) return;
   try {
     const data = JSON.parse(raw);
     selectedRating = data.rating || 0;
-    note.value = data.note || "";
+    if (textEl) textEl.value = data.note || data.text || "";
     updateStars();
   } catch {}
 }
@@ -89,7 +92,7 @@ function loadHistory() {
         <div>
           <div class="font-semibold">${date}</div>
           <div class="text-slate-400 truncate max-w-xs">
-            ${escapeHtml(data.text || "")}
+            ${escapeHtml(data.text || data.note || "")}
           </div>
         </div>
         <div class="text-yellow-400 text-lg">
@@ -99,11 +102,12 @@ function loadHistory() {
     `;
 
     item.addEventListener("click", () => {
-      textEl.value = data.text || "";
-      rating = data.rating || 0;
-      renderStars();
-      msg.innerText = `Loaded reflection from ${date}`;
-      setTimeout(() => msg.innerText = "", 2000);
+      var textEl = document.getElementById("reflectionText");
+      if (textEl) textEl.value = data.text || data.note || "";
+      selectedRating = data.rating || 0;
+      updateStars();
+      if (msg) msg.innerText = "Loaded reflection from " + date;
+      setTimeout(() => { if (msg) msg.innerText = ""; }, 2000);
     });
 
     list.appendChild(item);

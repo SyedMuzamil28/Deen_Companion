@@ -20,18 +20,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   } else {
     $hash = password_hash($pass, PASSWORD_DEFAULT);
 
-    $stmt = mysqli_prepare($conn, "INSERT INTO users(full_name,email,password_hash) VALUES(?,?,?)");
-    if (!$stmt) die("SQL prepare failed: " . mysqli_error($conn));
-
-    mysqli_stmt_bind_param($stmt, "sss", $name, $email, $hash);
-
-    if (mysqli_stmt_execute($stmt)) {
-      $_SESSION['user_id'] = mysqli_insert_id($conn);
-      $_SESSION['user_name'] = $name;
-      header("Location: /dashboard.php");
-      exit;
+    if (!$conn) {
+      $msg = "Service temporarily unavailable.";
     } else {
-      $msg = "Email already exists or error occurred.";
+      $stmt = mysqli_prepare($conn, "INSERT INTO users(full_name,email,password_hash) VALUES(?,?,?)");
+      if (!$stmt) {
+        $msg = "Registration error. Try again.";
+      } else {
+        mysqli_stmt_bind_param($stmt, "sss", $name, $email, $hash);
+        if (mysqli_stmt_execute($stmt)) {
+          $_SESSION['user_id'] = mysqli_insert_id($conn);
+          $_SESSION['user_name'] = $name;
+          header("Location: ../dashboard.php");
+          exit;
+        } else {
+          $msg = "Email already exists or error occurred.";
+        }
+      }
     }
   }
 }
@@ -69,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
 
     <p class="text-sm text-slate-300 mt-4">
-      Already have an account? <a class="underline" href="/auth/login.php">Login</a>
+      Already have an account? <a class="underline" href="login.php">Login</a>
     </p>
   </div>
 </body>

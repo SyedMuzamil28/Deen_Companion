@@ -159,24 +159,29 @@ const url = `https://api.aladhan.com/v1/timings/${day}-${month}-${year}?latitude
     });
 }
 
-// ----------------------
-// Init Location
-// ----------------------
+// Hyderabad, India fallback when location denied or unavailable (Ramadan Lite)
+var FALLBACK_LAT = 17.3850;
+var FALLBACK_LNG = 78.4867;
+
 function initLocation() {
+  function useFallback() {
+    if (statusEl) statusEl.innerText = "Using Hyderabad, India. Allow location for your city.";
+    fetchPrayerTimes(FALLBACK_LAT, FALLBACK_LNG);
+  }
+
   if (!navigator.geolocation) {
-    statusEl.innerText = "Geolocation not supported.";
+    useFallback();
     return;
   }
 
   navigator.geolocation.getCurrentPosition(
-    position => {
-      const lat = position.coords.latitude;
-      const lng = position.coords.longitude;
+    function (position) {
+      var lat = position.coords.latitude;
+      var lng = position.coords.longitude;
       fetchPrayerTimes(lat, lng);
     },
-    () => {
-      statusEl.innerText = "Location permission denied.";
-    }
+    useFallback,
+    { enableHighAccuracy: true, timeout: 10000 }
   );
 }
 

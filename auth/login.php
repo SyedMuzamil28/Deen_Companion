@@ -21,28 +21,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // We'll try "users" first; if table doesn't exist, you'll see the error clearly.
     $sql = "SELECT id, full_name, password_hash FROM users WHERE email=? LIMIT 1";
 
-    $stmt = mysqli_prepare($conn, $sql);
-    if (!$stmt) {
-      die("SQL prepare failed: " . mysqli_error($conn));
-    }
-
-    mysqli_stmt_bind_param($stmt, "s", $email);
-    mysqli_stmt_execute($stmt);
-    $res = mysqli_stmt_get_result($stmt);
-
-    if (!$res) {
-      die("SQL execute failed: " . mysqli_error($conn));
-    }
-
-    $user = mysqli_fetch_assoc($res);
-
-    if ($user && password_verify($pass, $user['password_hash'])) {
-      $_SESSION['user_id'] = $user['id'];
-      $_SESSION['user_name'] = $user['full_name'];
-      header("Location: /dashboard.php");
-      exit;
+    if (!$conn) {
+      $msg = "Service temporarily unavailable.";
     } else {
-      $msg = "Invalid email or password.";
+      $stmt = mysqli_prepare($conn, $sql);
+      if (!$stmt) {
+        $msg = "Login error. Try again.";
+      } else {
+        mysqli_stmt_bind_param($stmt, "s", $email);
+        mysqli_stmt_execute($stmt);
+        $res = mysqli_stmt_get_result($stmt);
+        if (!$res) {
+          $msg = "Login error. Try again.";
+        } else {
+          $user = mysqli_fetch_assoc($res);
+          if ($user && password_verify($pass, $user['password_hash'])) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_name'] = $user['full_name'];
+            header("Location: ../dashboard.php");
+            exit;
+          } else {
+            $msg = "Invalid email or password.";
+          }
+        }
+      }
     }
   }
 }
@@ -78,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
 
     <p class="text-sm text-slate-300 mt-4">
-      New here? <a class="underline" href="/auth/register.php">Create an account</a>
+      New here? <a class="underline" href="register.php">Create an account</a>
     </p>
   </div>
 </body>

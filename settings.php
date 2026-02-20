@@ -18,7 +18,7 @@ if (session_status() === PHP_SESSION_NONE) session_start();
       </p>
       <p class="text-slate-400 text-sm mt-1">You’re logged in. Your progress can be saved.</p>
 
-      <a href="/auth/logout.php"
+      <a href="auth/logout.php"
          class="inline-block mt-4 text-sm underline text-slate-300 hover:text-white">
         Logout →
       </a>
@@ -27,12 +27,12 @@ if (session_status() === PHP_SESSION_NONE) session_start();
       <p class="text-slate-300">Use as guest, or login to save your progress.</p>
 
       <div class="grid grid-cols-2 gap-3 mt-4">
-        <a href="/auth/login.php"
+        <a href="auth/login.php"
            class="bg-yellow-400 text-black font-semibold py-3 rounded-xl text-center hover:opacity-90 transition">
           Login
         </a>
 
-        <a href="/index.php"
+        <a href="index.php"
            class="bg-slate-900 border border-slate-700 text-white font-semibold py-3 rounded-xl text-center hover:opacity-90 transition">
           Continue as Guest
         </a>

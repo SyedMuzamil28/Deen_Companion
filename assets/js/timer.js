@@ -145,21 +145,23 @@ const url =
       });
   }
 
-  // Location
+  // Hyderabad, India fallback when location denied or unavailable (Ramadan Lite)
+  var FALLBACK_LAT = 17.3850;
+  var FALLBACK_LNG = 78.4867;
+
+  function useFallback() {
+    if (locationHintEl) locationHintEl.innerText = "Using Hyderabad, India (allow location in Settings for your city).";
+    fetchPrayerTimes(FALLBACK_LAT, FALLBACK_LNG);
+  }
+
   if (!navigator.geolocation) {
-    iftarEl.innerText = "No GPS";
-    sehriEl.innerText = "No GPS";
-    if (nextCdEl) nextCdEl.innerText = "No GPS";
+    useFallback();
     return;
   }
 
   navigator.geolocation.getCurrentPosition(
     pos => fetchPrayerTimes(pos.coords.latitude, pos.coords.longitude),
-    () => {
-      iftarEl.innerText = "Allow location";
-      sehriEl.innerText = "Allow location";
-      if (nextCdEl) nextCdEl.innerText = "Allow location";
-    },
+    useFallback,
     { enableHighAccuracy: true, timeout: 10000 }
   );
 });

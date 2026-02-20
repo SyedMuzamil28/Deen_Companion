@@ -1,5 +1,6 @@
 <?php
 session_start();
 session_destroy();
-header("Location: /auth/login.php");
+// Ramadan Lite: redirect to home (no login required)
+header("Location: ../index.php");
 exit;

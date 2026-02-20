@@ -1,12 +1,11 @@
 <?php
+// Ramadan Lite: Do not die on DB failure so site works without database.
+$host = "sql202.infinityfree.com";
+$user = "if0_41152364";
+$pass = "Syed7207";
+$db   = "if0_41152364_deencompanion";
 
-$host = "sql202.infinityfree.com";   // <-- exact hostname from panel
-$user = "if0_41152364";              // <-- your MySQL username
-$pass = "Syed7207";        // <-- your MySQL password
-$db   = "if0_41152364_deencompanion"; // <-- FULL database name
-
-$conn = mysqli_connect($host, $user, $pass, $db);
-
+$conn = @mysqli_connect($host, $user, $pass, $db);
 if (!$conn) {
-    die("Database connection failed: " . mysqli_connect_error());
+    $conn = null;
 }

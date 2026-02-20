@@ -1,12 +1,9 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) session_start();
-?>
-
-<?php if(!isset($_SESSION["user_id"])): ?>
-  <a href="/auth/login.php" class="block mt-4 bg-yellow-400 text-black font-semibold py-3 px-5 rounded-xl text-center">
-    Login / Create Account
-  </a>
-<?php endif; ?>
+// Ramadan Lite: No login required. Auth disabled for public launch.
+// <?php if(!isset($_SESSION["user_id"])): ?>
+//   <a href="auth/login.php" ...>Login / Create Account</a>
+// <?php endif; ?>
 
 
 
@@ -32,43 +29,15 @@ function navActive($page, $current) {
 
 
 <style>
-  main { padding-bottom: calc(98px + env(safe-area-inset-bottom)); }
-  html, body { background:#0f172a; overflow-x:hidden; }
-</style>
-
-
-    <style>
-  main { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
-  html, body { background: #0f172a; overflow-x: hidden; }
-</style>
-
-    
-    <style>
-  html, body { background: #0f172a; }
-  body { overflow-x: hidden; }
-
-  /* Reserve space for bottom nav so content never slides under it */
-  main { padding-bottom: calc(92px + env(safe-area-inset-bottom)); }
-
-  /* iOS smoother */
-  * { -webkit-tap-highlight-color: transparent; }
-</style>
-
-    <meta name="apple-mobile-web-app-title" content="Deen Companion">
-
-    <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#facc15">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Deen Companion">
-<link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
-
-    <style>
-  /* iOS safe area support */
   :root { --safe-bottom: env(safe-area-inset-bottom, 0px); }
+  html, body { background: #0f172a; overflow-x: hidden; }
+  main { padding-bottom: calc(96px + var(--safe-bottom)); }
+  * { -webkit-tap-highlight-color: transparent; }
+  @media (max-height: 700px) { .footer-credit { display: none; } }
+</style>
 
-  /* Bottom tab bar container */
-  .app-tabs{
+    <!-- Duplicate .app-tabs CSS removed for Ramadan Lite -->
+    <style type="text/template"><!-- .app-tabs{
     position: fixed;
     left: 0; right: 0;
     bottom: 0;
@@ -128,9 +97,6 @@ function navActive($page, $current) {
   }
 </style>
 
-  <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#facc15">
-
   <link href="https://fonts.googleapis.com/css2?family=Amiri&display=swap" rel="stylesheet">
 
   <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -181,18 +147,13 @@ function navActive($page, $current) {
       </div>
     </div>
 
+    <!-- Ramadan Lite: Dashboard, Prayer, Quran, Duas, Settings only -->
     <nav class="hidden sm:flex items-center gap-6 text-sm">
+      <a class="<?= navActive('dashboard.php', $current) ?>" href="dashboard.php">Dashboard</a>
       <a class="<?= navActive('prayer.php', $current) ?>" href="prayer.php">Prayer</a>
-    <a class="<?= navActive('dashboard.php', $current) ?>" href="dashboard.php">Dashboard</a>
-      <a class="<?= navActive('reflection.php', $current) ?>" href="reflection.php">Reflections</a>
+      <a class="<?= navActive('quran.php', $current) ?>" href="quran.php">Quran</a>
       <a class="<?= navActive('duas.php', $current) ?>" href="duas.php">Duas</a>
-      <a class="<?= navActive('family.php', $current) ?>" href="family.php">Family</a>
       <a class="<?= navActive('settings.php', $current) ?>" href="settings.php">Settings</a>
-      <a class="<?= navActive('stories.php', $current) ?>" href="stories.php">Stories</a>
-    <a class="<?= navActive('quran.php', $current) ?>" href="quran.php">Quran</a>
-    <a class="<?= navActive('quran-plan.php', $current) ?>" href="quran-plan.php">Plan</a>
-
-
     </nav>
   </div>
 </header>

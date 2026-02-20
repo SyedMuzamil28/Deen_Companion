@@ -4,10 +4,17 @@ include "../config/db.php";
 
 $method = $_SERVER['REQUEST_METHOD'];
 
+if (!$conn) {
+  if ($method === "GET") { echo json_encode([]); exit; }
+  http_response_code(503);
+  echo json_encode(["error" => "Service unavailable"]);
+  exit;
+}
+
 if ($method === "GET") {
   $res = mysqli_query($conn, "SELECT member_uid, name, emoji FROM family_members ORDER BY id ASC");
   $rows = [];
-  while ($r = mysqli_fetch_assoc($res)) $rows[] = $r;
+  if ($res) { while ($r = mysqli_fetch_assoc($res)) $rows[] = $r; }
   echo json_encode($rows);
   exit;
 }
