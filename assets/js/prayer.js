@@ -115,12 +115,10 @@ function renderCards(times) {
     if (!time) return;
 
     const card = document.createElement("div");
-    card.className = "bg-slate-800 rounded-2xl p-5 shadow";
-
-    card.innerHTML = `
-      <div class="text-slate-400 text-sm mb-2">${p.label}</div>
-      <div class="text-2xl font-bold text-yellow-400">${time}</div>
-    `;
+    card.className = "card p-5";
+    card.style.background = "var(--bg-card)";
+    card.style.borderColor = "var(--border)";
+    card.innerHTML = '<div class="text-sm mb-1" style="color:var(--text-muted);">' + p.label + '</div><div class="text-xl font-bold" style="color:var(--accent);">' + time + '</div>';
 
     cardsEl.appendChild(card);
   });
@@ -148,10 +146,10 @@ const url = `https://api.aladhan.com/v1/timings/${day}-${month}-${year}?latitude
 
       const timings = data.data.timings;
 
-      statusEl.innerText = "Location detected successfully.";
+      if (statusEl) statusEl.innerText = "Location detected.";
+      var countdownEl = document.getElementById("countdownBox");
+      if (countdownEl) countdownEl.classList.remove("hidden");
       renderCards(timings);
-
-      // ✅ START COUNTDOWN (You forgot this before)
       startCountdown(timings);
     })
     .catch(() => {

@@ -1,0 +1,69 @@
+/* Deen Companion – Ramadan Release – Global */
+:root {
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --nav-h: 72px;
+  /* Dark (default) – deep green/black Islamic */
+  --bg: #0a1f0a;
+  --bg-card: #0f2d0f;
+  --bg-input: #0d260d;
+  --border: rgba(34, 197, 94, 0.2);
+  --text: #e8f5e9;
+  --text-muted: #9ca39b;
+  --accent: #22c55e;
+  --accent-dim: #166534;
+  --shadow: 0 4px 14px rgba(0,0,0,0.25);
+}
+body.light-mode {
+  --bg: #f5f5e8;
+  --bg-card: #fffef5;
+  --bg-input: #fff;
+  --border: rgba(34, 197, 94, 0.25);
+  --text: #1a2e1a;
+  --text-muted: #4a5d4a;
+  --accent: #166534;
+  --accent-dim: #15803d;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  transition: background 0.3s ease, color 0.2s ease;
+}
+main {
+  padding-bottom: calc(var(--nav-h) + var(--safe-bottom));
+}
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+/* Arabic / Quran */
+.arabic, .quran-arabic {
+  font-family: "Amiri", "Noto Naskh Arabic", serif;
+}
+.quran-arabic {
+  font-size: 1.5rem;
+  line-height: 2;
+  letter-spacing: 0.02em;
+}
+/* Cards */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  box-shadow: var(--shadow);
+}
+/* Theme toggle */
+.theme-toggle {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: transform 0.2s;
+}
+.theme-toggle:active { transform: scale(0.95); }
+@media (max-height: 700px) { .footer-credit { display: none; } }

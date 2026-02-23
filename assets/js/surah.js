@@ -51,9 +51,10 @@ function applyRate(){ player.playbackRate = getRate(); }
 function setPlayingUI(card, isPlaying) {
   if (!card) return;
   card.classList.toggle("ring-2", isPlaying);
-  card.classList.toggle("ring-yellow-400", isPlaying);
+  card.style.outline = isPlaying ? "2px solid var(--accent)" : "";
+  card.style.outlineOffset = "2px";
   const badge = card.querySelector("[data-audio-badge]");
-  if (badge) badge.innerText = isPlaying ? "🔊 Playing" : "▶ Tap to listen";
+  if (badge) badge.innerText = isPlaying ? "🔊" : "▶";
 }
 
 function scrollToCard(card){ card?.scrollIntoView({ behavior:"smooth", block:"center" }); }
@@ -170,24 +171,17 @@ function renderSurah(textSurah, trSurah, audioSurah, editionLabel) {
     const tr = translationByAyah[ayahNo] || "";
 
     const card = document.createElement("div");
-    card.className = "bg-slate-800 rounded-2xl p-5 shadow cursor-pointer hover:bg-slate-700 transition";
+    card.className = "card p-5 cursor-pointer transition";
+    card.style.background = "var(--bg-card)";
     card.dataset.ayah = String(ayahNo);
 
-    card.innerHTML = `
-      <div class="flex items-start justify-between gap-4">
-        <div class="arabic text-2xl leading-relaxed text-right flex-1">
-          ${escapeHtml(ayah.text)}
-          <span class="text-yellow-400 text-base align-middle">﴿${ayahNo}﴾</span>
-        </div>
-        <div class="text-slate-300 text-xs whitespace-nowrap" data-audio-badge>
-          ${url ? "▶ Tap to listen" : "No audio"}
-        </div>
-      </div>
-
-      <div class="mt-3 text-slate-200 text-sm leading-relaxed ${showTr ? "" : "hidden"}" data-tr>
-        ${escapeHtml(tr)}
-      </div>
-    `;
+    card.innerHTML =
+      '<div class="flex items-start justify-between gap-4">' +
+        '<div class="quran-arabic text-right flex-1">' + escapeHtml(ayah.text) +
+        ' <span class="text-base" style="color:var(--accent);">﴿' + ayahNo + '﴾</span></div>' +
+        '<div class="text-xs whitespace-nowrap" style="color:var(--text-muted);" data-audio-badge>' + (url ? "▶" : "—") + '</div>' +
+      '</div>' +
+      '<div class="mt-3 text-sm leading-relaxed ' + (showTr ? "" : "hidden") + '" data-tr style="color:var(--text-muted);">' + escapeHtml(tr) + '</div>';
 
     if (url) {
       card.addEventListener("click", () => {
@@ -205,26 +199,30 @@ function renderSurah(textSurah, trSurah, audioSurah, editionLabel) {
   return queue;
 }
 
+var surahLoadingEl = document.getElementById("surahLoading");
+
 async function loadSurahWithQari(edition) {
   stopPlayback();
-  titleEl.innerText = "Loading...";
-  metaEl.innerText = "Fetching Quran text, translation and audio…";
-  ayahEl.innerHTML = `<div class="text-slate-300">Loading…</div>`;
+  if (titleEl) titleEl.innerText = "Loading…";
+  if (metaEl) metaEl.innerText = "";
+  if (surahLoadingEl) surahLoadingEl.classList.remove("hidden");
+  if (ayahEl) { ayahEl.innerHTML = ""; ayahEl.classList.add("hidden"); }
 
-  const editionLabel = qariSelect?.options[qariSelect.selectedIndex]?.textContent || edition;
+  var editionLabel = qariSelect && qariSelect.options[qariSelect.selectedIndex] ? qariSelect.options[qariSelect.selectedIndex].textContent : edition;
 
   try {
-    const [textSurah, trSurah, audioSurah] = await Promise.all([
-      fetchTextSurah(),
-      fetchTranslationSurah(),
-      fetchAudioSurah(edition)
-    ]);
-
+    var textSurah = await fetchTextSurah();
+    var trSurah = await fetchTranslationSurah();
+    var audioSurah = await fetchAudioSurah(edition);
     playQueue = renderSurah(textSurah, trSurah, audioSurah, editionLabel);
-  } catch {
-    titleEl.innerText = "Failed to load Surah.";
-    metaEl.innerText = "Check your internet connection and try again.";
-    ayahEl.innerHTML = "";
+    if (surahLoadingEl) surahLoadingEl.classList.add("hidden");
+    if (ayahEl) ayahEl.classList.remove("hidden");
+  } catch (e) {
+    if (titleEl) titleEl.innerText = "Failed to load.";
+    if (metaEl) metaEl.innerText = "Check your connection.";
+    if (surahLoadingEl) surahLoadingEl.classList.add("hidden");
+    if (ayahEl) ayahEl.classList.remove("hidden");
+    if (ayahEl) ayahEl.innerHTML = "";
   }
 }
 

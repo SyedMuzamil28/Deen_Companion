@@ -1,100 +1,80 @@
-// --- Sample Duas (will move to DB later) ---
-const DUAS = [
-  {
-    id: "sehri_1",
-    category: "sehri",
-    arabic: "وَبِصَوْمِ غَدٍ نَّوَيْتُ مِنْ شَهْرِ رَمَضَانَ",
-    meaning: "I intend to keep the fast for tomorrow in the month of Ramadan."
-  },
-  {
-    id: "iftar_1",
-    category: "iftar",
-    arabic: "اللَّهُمَّ إِنِّي لَكَ صُمْتُ وَبِكَ آمَنْتُ",
-    meaning: "O Allah, I fasted for You and I believe in You."
-  },
-  {
-    id: "general_1",
-    category: "general",
-    arabic: "رَبِّ زِدْنِي عِلْمًا",
-    meaning: "My Lord, increase me in knowledge."
+(function() {
+  var DUAS = [
+    { id: "sehri_1", category: "sehri", section: "Sehri", arabic: "وَبِصَوْمِ غَدٍ نَّوَيْتُ مِنْ شَهْرِ رَمَضَانَ", meaning: "I intend to keep the fast for tomorrow in the month of Ramadan." },
+    { id: "sehri_2", category: "sehri", section: "Sehri", arabic: "نَوَيْتُ أَنْ أَصُومَ غَداً عَنْ أَدَاءِ فَرْضِ شَهْرِ رَمَضَانَ هَذِهِ السَّنَةِ", meaning: "I intend to observe the fast of Ramadan tomorrow this year." },
+    { id: "iftar_1", category: "iftar", section: "Iftar", arabic: "اللَّهُمَّ إِنِّي لَكَ صُمْتُ وَبِكَ آمَنْتُ وَعَلَيْكَ تَوَكَّلْتُ وَعَلَى رِزْقِكَ أَفْطَرْتُ", meaning: "O Allah, I fasted for You, I believe in You, I put my trust in You and I break my fast with Your provision." },
+    { id: "iftar_2", category: "iftar", section: "Iftar", arabic: "ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الْأَجْرُ إِنْ شَاءَ اللَّهُ", meaning: "Thirst is gone, the veins are moistened and the reward is confirmed, if Allah wills." },
+    { id: "general_1", category: "general", section: "General", arabic: "رَبِّ زِدْنِي عِلْمًا", meaning: "My Lord, increase me in knowledge." },
+    { id: "general_2", category: "general", section: "General", arabic: "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ", meaning: "Our Lord, give us good in this world and good in the Hereafter, and protect us from the punishment of the Fire." }
+  ];
+
+  var KEY_FAV = "deen_dua_favs";
+  function loadFavs() {
+    try { return JSON.parse(localStorage.getItem(KEY_FAV) || "[]"); } catch (e) { return []; }
   }
-];
+  function saveFavs(arr) { localStorage.setItem(KEY_FAV, JSON.stringify(arr)); }
 
-// --- Helpers ---
-function activeMemberId() {
-  return localStorage.getItem("rc_active_member_id") || "default";
-}
+  var listEl = document.getElementById("duaList");
+  var currentFilter = "all";
 
-function favKey() {
-  return `ramadan_dua_favs_${activeMemberId()}`;
-}
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, function(s) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[s]; });
+  }
 
-function loadFavs() {
-  const raw = localStorage.getItem(favKey());
-  if (!raw) return [];
-  try { return JSON.parse(raw); } catch { return []; }
-}
+  function render() {
+    if (!listEl) return;
+    var favs = loadFavs();
+    var list = currentFilter === "all" ? DUAS : DUAS.filter(function(d) { return d.category === currentFilter; });
+    listEl.innerHTML = "";
+    list.forEach(function(d) {
+      var isFav = favs.indexOf(d.id) !== -1;
+      var card = document.createElement("div");
+      card.className = "card p-5";
+      card.style.background = "var(--bg-card)";
+      card.style.borderColor = "var(--border)";
+      card.innerHTML =
+        '<div class="flex items-start justify-between gap-3">' +
+          '<div class="flex-1 min-w-0">' +
+            '<span class="text-xs font-medium uppercase" style="color:var(--accent);">' + escapeHtml(d.section || d.category) + '</span>' +
+            '<div class="arabic text-lg mt-2 leading-relaxed">' + escapeHtml(d.arabic) + '</div>' +
+            '<div class="text-sm mt-2" style="color:var(--text-muted);">' + escapeHtml(d.meaning) + '</div>' +
+          '</div>' +
+          '<button type="button" class="favBtn text-xl flex-shrink-0 p-1" data-id="' + escapeHtml(d.id) + '" aria-label="Favorite">' + (isFav ? "★" : "☆") + '</button>' +
+        '</div>';
+      listEl.appendChild(card);
+      var btn = card.querySelector(".favBtn");
+      if (btn) {
+        btn.style.color = isFav ? "var(--accent)" : "var(--text-muted)";
+        btn.addEventListener("click", function() {
+          var id = btn.getAttribute("data-id");
+          var f = loadFavs();
+          var i = f.indexOf(id);
+          if (i === -1) f.push(id); else f.splice(i, 1);
+          saveFavs(f);
+          render();
+        });
+      }
+    });
+  }
 
-function saveFavs(favs) {
-  localStorage.setItem(favKey(), JSON.stringify(favs));
-}
-
-// --- Render ---
-const listEl = document.getElementById("duaList");
-let currentFilter = "all";
-
-function render() {
-  const favs = loadFavs();
-  listEl.innerHTML = "";
-
-  DUAS.filter(d => currentFilter === "all" || d.category === currentFilter)
-      .forEach(d => {
-        const isFav = favs.includes(d.id);
-
-        const card = document.createElement("div");
-        card.className = "bg-slate-800 rounded-2xl p-6 shadow";
-
-        card.innerHTML = `
-          <div class="flex items-start justify-between gap-4">
-            <div>
-              <div class="arabic text-xl font-semibold mb-2">${d.arabic}</div>
-              <div class="text-slate-300 text-sm">${d.meaning}</div>
-              <div class="mt-3 text-xs text-slate-400 uppercase">${d.category}</div>
-            </div>
-            <button class="favBtn text-2xl ${isFav ? "text-yellow-400" : "text-slate-500"}"
-                    data-id="${d.id}">
-              ★
-            </button>
-          </div>
-        `;
-
-        listEl.appendChild(card);
+  document.querySelectorAll(".filterBtn").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      currentFilter = btn.getAttribute("data-filter") || "all";
+      document.querySelectorAll(".filterBtn").forEach(function(b) {
+        b.style.background = "";
+        b.style.color = "";
       });
-
-  // Wire fav buttons
-  document.querySelectorAll(".favBtn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = btn.dataset.id;
-      let favs = loadFavs();
-      favs = favs.includes(id) ? favs.filter(x => x !== id) : [...favs, id];
-      saveFavs(favs);
+      btn.style.background = "var(--accent)";
+      btn.style.color = "#fff";
       render();
     });
   });
-}
 
-// Filters
-document.querySelectorAll(".filterBtn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    currentFilter = btn.dataset.filter;
-    document.querySelectorAll(".filterBtn").forEach(b => {
-      b.classList.remove("bg-yellow-400","text-black");
-      b.classList.add("bg-slate-800");
-    });
-    btn.classList.add("bg-yellow-400","text-black");
-    render();
+  document.querySelectorAll(".filterBtn").forEach(function(b) {
+    if ((b.getAttribute("data-filter") || "all") === currentFilter) {
+      b.style.background = "var(--accent)";
+      b.style.color = "#fff";
+    }
   });
-});
-
-// Init
-render();
+  render();
+})();
